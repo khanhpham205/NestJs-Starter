@@ -10,7 +10,9 @@ import { AuthModule } from '@/modules/auth/auth.module';
 import { TagsModule } from '@/modules/tags/tags.module';
 import { ProductModule } from './modules/product/product.module';
 
-import { AuthGuard } from '@nestjs/passport';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './modules/auth/passport/jwt-auth.guard';
+import { RolesGuard } from './modules/auth/passport/roles.guard';
 
 @Module({
     imports: [
@@ -28,6 +30,16 @@ import { AuthGuard } from '@nestjs/passport';
         ProductModule
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [
+        AppService,
+        {
+            provide: APP_GUARD,
+            useClass: JwtAuthGuard,
+        }, 
+        {
+            provide: APP_GUARD,
+            useClass: RolesGuard,
+        },
+    ],
 })
 export class AppModule {}

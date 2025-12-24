@@ -17,6 +17,9 @@ import { ChangePasswordUserDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from '../auth/passport/jwt-auth.guard';
 
 import {Request, Response}  from 'express';
+import { Roles } from '@/decorator/roles.decorator';
+import { Role } from '@/types/role.enum';
+import { Public } from '@/decorator/custom';
 
 
 @Controller('users')
@@ -24,13 +27,13 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) {}
 
     @Get('me')
-    @UseGuards(JwtAuthGuard)
     async me(@Req() req: Request) {
         return req.user;
     }
     
 
     @Post()
+    @Public()
     create(@Body() createUserDto: CreateUserDto) {
         return this.usersService.create(createUserDto);
     }
@@ -41,6 +44,7 @@ export class UsersController {
     }
 
     @Get()
+    @Roles(Role.ADMIN)
     findAll(
         @Query('page') page: number,
         @Query('limit') limit: number,
