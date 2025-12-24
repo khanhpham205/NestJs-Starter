@@ -10,6 +10,7 @@ import { AuthModule } from '@/modules/auth/auth.module';
 import { TagsModule } from '@/modules/tags/tags.module';
 import { ProductModule } from './modules/product/product.module';
 
+import { AuthGuard } from '@nestjs/passport';
 
 @Module({
     imports: [
@@ -22,7 +23,9 @@ import { ProductModule } from './modules/product/product.module';
             inject :[ConfigService]
         }),
         AuthModule, 
-        UsersModule, TagsModule, ProductModule
+        UsersModule, 
+        TagsModule, 
+        ProductModule
     ],
     controllers: [AppController],
     providers: [AppService],
