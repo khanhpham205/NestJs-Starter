@@ -8,8 +8,7 @@ import { TagsDocument } from '../tags/schemas/tags.schema';
 @Injectable()
 export class ProductService {
     constructor(
-        private readonly productModel: Model<ProductDocument>,
-        private readonly tagsModel: Model<TagsDocument>,
+        private readonly productModel: Model<ProductDocument>
     ) {}
     
     async create(createProductDto: CreateProductDto) {

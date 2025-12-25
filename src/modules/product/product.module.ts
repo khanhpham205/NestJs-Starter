@@ -11,11 +11,7 @@ import { TagsSchema } from '../tags/schemas/tags.schema';
             { 
                 name: 'Product', 
                 schema: ProductSchema 
-            },
-            { 
-                name: 'Tags', 
-                schema: TagsSchema 
-            },
+            }
         ]),
 
 
