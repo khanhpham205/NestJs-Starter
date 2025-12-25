@@ -7,7 +7,7 @@ export class CreateProductDto {
     name: string;
 
     @IsNotEmpty()
-    @IsNumber({ maxDecimalPlaces: 2 }) // 19.99
+    @IsAlphanumeric()
     price: number;
 
     @IsOptional()

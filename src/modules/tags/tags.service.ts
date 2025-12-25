@@ -1,14 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { TagsDocument } from './schemas/tags.schema';
+import { Tags } from './schemas/tags.schema';
 import { Model } from 'mongoose';
 
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class TagsService {
     constructor(
-        private readonly tagsModel: Model<TagsDocument>,
+        @InjectModel(Tags.name) 
+        private readonly tagsModel: Model<Tags>,
     ) {}
 
 

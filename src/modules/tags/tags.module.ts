@@ -9,7 +9,7 @@ import { MongooseModule } from '@nestjs/mongoose';
         MongooseModule.forFeature([{
             name: 'Tags',
             schema: TagsSchema,
-        }]),
+        }])
     ],
     controllers: [TagsController],
     providers: [TagsService],

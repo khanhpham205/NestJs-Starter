@@ -1,23 +1,60 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Model, Types } from 'mongoose';
-import { ProductDocument } from './schemas/products.schema';
-import { TagsDocument } from '../tags/schemas/tags.schema';
+import { Product } from './schemas/products.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { existsSync, mkdirSync, writeFileSync, unlinkSync } from 'fs';
+import { join, extname } from 'path';
+
+
 
 @Injectable()
 export class ProductService {
     constructor(
-        private readonly productModel: Model<ProductDocument>
+        @InjectModel(Product.name) 
+        private readonly productModel: Model<Product>
     ) {}
     
-    async create(createProductDto: CreateProductDto) {
+    async create(
+        createProductDto: CreateProductDto,
+        file: Express.Multer.File,
+    ) {
         try {
-            // should handle file upload and add url to record
-            await this.productModel.create(createProductDto);
-            return 'Product created successfully';
+            const _id = new Types.ObjectId(); // product id
+            // use memoryStorage to handle file upload
+            // easy to want custom file path
+            
+            if(file) {
+                // save file 
+                const folder = join(
+                    process.cwd(), 
+                    `public/product`, 
+                    _id.toString()
+                );
+
+                if (!existsSync(folder)) mkdirSync(folder, { recursive: true });
+                
+                const filename = `thumbnail-${Date.now()}${extname(file.originalname)}`;
+                const filePath = join(folder, filename);
+                
+                
+                createProductDto.image = `public/product/${_id.toString()}/${filename}`;
+                
+                const newProduct = await this.productModel.create({
+                    _id,
+                    ...createProductDto
+                });
+
+                writeFileSync(filePath, file.buffer);
+                return newProduct;
+            }
+            return await this.productModel.create({ _id, ...createProductDto });
         } catch (error) {
-            return 'Could not create Product';
+            if (error.code === 11000) {
+                throw new ConflictException('Product already exists');
+            }
+            throw new InternalServerErrorException('Could not create product');   
         }
     }
     
@@ -97,7 +134,7 @@ export class ProductService {
         }
     }
 
-    async update(id: number, updateProductDto: UpdateProductDto) {
+    async update(id: string, updateProductDto: UpdateProductDto) {
         try {
             await this.productModel
             .findByIdAndUpdate(id, updateProductDto)
@@ -108,7 +145,7 @@ export class ProductService {
         }
     }
 
-    async remove(id: number) {
+    async remove(id: string) {
         // soft delete
         try {
             const product = await this.productModel.findById(id).exec();
