@@ -17,6 +17,38 @@ export class User {
     })
     email: string;
 
+    @Prop({
+        unique: true,
+        sparse:true
+    })
+    googleId: string;
+
+    @Prop()
+    verified: boolean;
+
+    @Prop()
+    picture: string;
+
+    // @Prop()
+    // googleAccessToken: string;
+    
+    // @Prop()
+    // googleRefreshToken: string;
+
+    // @Prop()
+    // googleTokenExpiry: Date;
+
+
+
+
+    @Prop({
+        enum:['local', 'google'],
+        default: 'local',
+        required: true,
+    })
+    provider: string;
+
+
     @Prop()
     hashedPassword: string;
 

@@ -12,10 +12,13 @@ import { UsersModule } from '@/modules/users/users.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { TagsModule } from '@/modules/tags/tags.module';
 import { ProductModule } from './modules/product/product.module';
+import { UploadModule } from './modules/upload/upload.module';
+
 
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './modules/auth/passport/jwt-auth.guard';
 import { RolesGuard } from './modules/auth/passport/roles.guard';
+
 import { join } from 'path';
 
 @Module({
@@ -35,7 +38,8 @@ import { join } from 'path';
         AuthModule, 
         UsersModule, 
         TagsModule, 
-        ProductModule
+        ProductModule,
+        UploadModule
     ],
     controllers: [AppController],
     providers: [

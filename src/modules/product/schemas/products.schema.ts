@@ -28,7 +28,7 @@ export class Product {
     description: string;
     
     @Prop()
-    image: string;    
+    thumbnailUrl: string;
 
     @Prop()
     deletedAt: Date; // soft detele

@@ -8,6 +8,7 @@ import { ChangePasswordUserDto } from './dto/change-password.dto';
 
 import { hashPassword, matchPassword } from '@/utils/password';
 import { ConfigService } from '@nestjs/config';
+import { CreateUserGoogleDto } from './dto/create-user-by-GG.dto';
 
 @Injectable()
 export class UsersService {
@@ -32,6 +33,22 @@ export class UsersService {
             hashedPassword: hashedPassword,
         });
         return 'User created successfully'; 
+    }
+
+    async createWithGoogle(createUserDto: CreateUserGoogleDto) {
+        if (await this.isEmailExisting(createUserDto.email)) {
+            throw new BadRequestException('User with this email already exists');
+        }
+
+        return await this.userModel.create({
+            userName: createUserDto.userName,
+            email: createUserDto.email,
+            googleId: createUserDto.googleId,
+            // googleAccessToken: createUserDto.googleAccessToken,
+            // googleRefreshToken: createUserDto.googleRefreshToken,
+            // googleTokenExpiry: createUserDto.googleTokenExpiry,
+            provider: 'google',
+        });
     }
 
     async changePassword(_id: string, createUserDto: ChangePasswordUserDto) {
