@@ -27,8 +27,4 @@ export class UploadController {
             size: file.size,
         };
     }
-
-
-
-    
 }

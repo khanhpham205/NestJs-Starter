@@ -7,37 +7,43 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordUserDto } from './dto/change-password.dto';
 
 import { hashPassword, matchPassword } from '@/utils/password';
-import { ConfigService } from '@nestjs/config';
 import { CreateUserGoogleDto } from './dto/create-user-by-GG.dto';
 
 @Injectable()
 export class UsersService {
     constructor(
-        @InjectModel(User.name) 
-        private readonly userModel: Model<User>){}
+        @InjectModel(User.name)
+        private readonly userModel: Model<User>,
+    ) {}
 
     async isEmailExisting(email: string): Promise<boolean> {
-        return await this.userModel.exists({ email }).then( result => !!result );
+        return await this.userModel
+            .exists({ email })
+            .then((result) => !!result);
     }
 
     async create(createUserDto: CreateUserDto) {
         if (await this.isEmailExisting(createUserDto.email)) {
-            throw new BadRequestException('User with this email already exists');
+            throw new BadRequestException(
+                'User with this email already exists',
+            );
         }
 
-        const hashedPassword = await hashPassword( createUserDto.password );
-        
+        const hashedPassword = await hashPassword(createUserDto.password);
+
         await this.userModel.create({
             userName: createUserDto.userName,
             email: createUserDto.email,
             hashedPassword: hashedPassword,
         });
-        return 'User created successfully'; 
+        return 'User created successfully';
     }
 
     async createWithGoogle(createUserDto: CreateUserGoogleDto) {
         if (await this.isEmailExisting(createUserDto.email)) {
-            throw new BadRequestException('User with this email already exists');
+            throw new BadRequestException(
+                'User with this email already exists',
+            );
         }
 
         return await this.userModel.create({
@@ -63,11 +69,13 @@ export class UsersService {
             createUserDto.oldPassword,
             user.hashedPassword,
         );
-        if(!isOldPasswordValid){
+        if (!isOldPasswordValid) {
             throw new BadRequestException('Old password is incorrect');
         }
-        const newHashedPassword = await hashPassword( createUserDto.oldPassword );
-        await this.userModel.updateOne({ _id }, { hashedPassword: newHashedPassword }).exec();
+        const newHashedPassword = await hashPassword(createUserDto.oldPassword);
+        await this.userModel
+            .updateOne({ _id }, { hashedPassword: newHashedPassword })
+            .exec();
         // should send email notification here
         return 'Password changed successfully';
     }
@@ -82,8 +90,17 @@ export class UsersService {
                 .limit(limit)
                 .skip((page - 1) * limit)
                 .exec();
-            return [...users, { page, limit, totalpages: Math.ceil( await this.userModel.countDocuments() / limit ) }];
-        } catch (error) {
+            return [
+                ...users,
+                {
+                    page,
+                    limit,
+                    totalpages: Math.ceil(
+                        (await this.userModel.countDocuments()) / limit,
+                    ),
+                },
+            ];
+        } catch {
             throw new BadRequestException('Could not get users');
         }
     }
@@ -103,8 +120,11 @@ export class UsersService {
     }
 
     async update(id: string, updateUserDto: UpdateUserDto) {
-        const update = await this.userModel.updateOne({ _id: id }, updateUserDto);
-        if(!update.matchedCount){
+        const update = await this.userModel.updateOne(
+            { _id: id },
+            updateUserDto,
+        );
+        if (!update.matchedCount) {
             throw new BadRequestException('User not found');
         }
         return 'User updated successfully';
@@ -115,16 +135,18 @@ export class UsersService {
         const user = await this.userModel
             .findById(id)
             .select('-hashedPassword')
-            .exec();        
+            .exec();
         if (!user) {
             throw new BadRequestException('User not found');
         }
-        
+
         // Hard delete
         // await this.userModel.deleteOne({ _id: id }).exec();
 
         // Soft delete
-        await this.userModel.updateOne({ _id: id }, { isDeleted: true, deletedAt: new Date() }).exec();
+        await this.userModel
+            .updateOne({ _id: id }, { isDeleted: true, deletedAt: new Date() })
+            .exec();
 
         // should send email notification here
         return `User deleted successfully`;

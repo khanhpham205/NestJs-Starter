@@ -1,14 +1,10 @@
-import { Optional } from "@nestjs/common";
-import { IsDate, IsNotEmpty, IsString, MinLength } from "class-validator";
-
-
-
+import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class CreateUserDto {
     @IsNotEmpty()
     @IsString()
     userName: string;
-    
+
     @IsNotEmpty()
     @IsString()
     email: string;
@@ -18,4 +14,3 @@ export class CreateUserDto {
     @MinLength(6)
     password: string;
 }
-

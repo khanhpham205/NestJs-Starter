@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes } from 'crypto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -25,7 +29,6 @@ export class AuthService {
         private readonly authModel: Model<AuthSession>,
     ) {}
 
-
     async register(registerDto: RegisterDto) {
         const hashedPassword = await hashPassword(registerDto.password);
         await this.usersService.create({
@@ -40,9 +43,9 @@ export class AuthService {
         // return '123'
         const user = await this.usersService.findByEmail(email);
         if (
-            !user || 
-            !user.hashedPassword || 
-            !await matchPassword( pass, user.hashedPassword as string)
+            !user ||
+            !user.hashedPassword ||
+            !(await matchPassword(pass, user.hashedPassword))
         ) {
             throw new UnauthorizedException();
         }
@@ -51,7 +54,7 @@ export class AuthService {
     }
 
     async login(user: any) {
-        if(!user || !user._id){
+        if (!user || !user._id) {
             throw new UnauthorizedException();
         }
         const payload = {
@@ -101,21 +104,19 @@ export class AuthService {
     }
 
     async loginWithGoogle(googleUser: any) {
-        const { 
-            googleId, 
+        const {
+            googleId,
             name,
-            email, 
+            email,
             verified,
-            picture, 
-            // accessToken, 
-            // refreshToken 
+            picture,
+            // accessToken,
+            // refreshToken
         } = googleUser;
 
-        let user = await this.usersService.findByEmail(email);
+        const user = await this.usersService.findByEmail(email);
         // console.log(`emai: ${email}, id:${googleId}`);
         // console.log(googleUser);
-        
-        
 
         if (user) {
             // CASE 1: User tồn tại với cùng Google ID -> Login
@@ -125,7 +126,9 @@ export class AuthService {
 
             // CASE 2: User tồn tại với Google ID khác -> Không cho login
             if (user.googleId && user.googleId !== googleId) {
-                throw new BadRequestException('This email is already linked to another Google account');
+                throw new BadRequestException(
+                    'This email is already linked to another Google account',
+                );
             }
         }
 
@@ -134,7 +137,7 @@ export class AuthService {
             userName: name,
             email,
             googleId,
-            verified
+            verified,
 
             // googleAccessToken: accessToken,
             // googleRefreshToken: refreshToken,
@@ -143,5 +146,4 @@ export class AuthService {
         // console.log(newUser);
         return await this.login(newUser);
     }
-
 }

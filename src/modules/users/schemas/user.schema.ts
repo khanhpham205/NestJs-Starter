@@ -5,21 +5,20 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true, collection: 'User' })
 export class User {
-    
-    @Prop({required: true, trim: true , lowercase: true })
+    @Prop({ required: true, trim: true, lowercase: true })
     userName: string;
 
     @Prop({
-        required:true, 
-        unique: true, 
-        trim: true , 
-        lowercase: true 
+        required: true,
+        unique: true,
+        trim: true,
+        lowercase: true,
     })
     email: string;
 
     @Prop({
         unique: true,
-        sparse:true
+        sparse: true,
     })
     googleId: string;
 
@@ -31,40 +30,33 @@ export class User {
 
     // @Prop()
     // googleAccessToken: string;
-    
+
     // @Prop()
     // googleRefreshToken: string;
 
     // @Prop()
     // googleTokenExpiry: Date;
 
-
-
-
     @Prop({
-        enum:['local', 'google'],
+        enum: ['local', 'google'],
         default: 'local',
         required: true,
     })
     provider: string;
 
-
     @Prop()
     hashedPassword: string;
 
-    
-    @Prop({ 
-        enum:['user','admin'],
-        default: 'user'
+    @Prop({
+        enum: ['user', 'admin'],
+        default: 'user',
     })
     role: string;
 
-    
     @Prop()
     phone: string;
     @Prop()
     address: string;
-
 
     @Prop()
     isDeleted: boolean;

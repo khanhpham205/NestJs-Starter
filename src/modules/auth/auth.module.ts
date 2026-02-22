@@ -24,17 +24,15 @@ import { GoogleStrategy } from './passport/google.strategy';
                 },
             }),
         }),
-        MongooseModule.forFeature([{ 
-            name: 'AuthSession', 
-            schema: AuthSchema
-        }]),
-        
-        
-        
+        MongooseModule.forFeature([
+            {
+                name: 'AuthSession',
+                schema: AuthSchema,
+            },
+        ]),
+
         UsersModule,
         PassportModule,
-
-
     ],
     providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
     controllers: [AuthController],

@@ -32,27 +32,22 @@ export class ProductController {
     @Post()
     // @Roles(Role.ADMIN)
     @Public()
-    @UseInterceptors(FileInterceptor('file', {
+    @UseInterceptors(
+        FileInterceptor('file', {
             storage: multer.memoryStorage(),
             limits: { fileSize: 5 * 1024 * 1024 },
-    }))
+        }),
+    )
     create(
         @Body() createProductDto: CreateProductDto,
-        @UploadedFile() file: Express.Multer.File
+        @UploadedFile() file: Express.Multer.File,
     ) {
         return this.productService.create(createProductDto, file);
     }
 
-
-
-
-
     @Get()
     @Public()
-    findAll(
-        @Query('page') page: number, 
-        @Query('limit') limit: number
-    ) {
+    findAll(@Query('page') page: number, @Query('limit') limit: number) {
         return this.productService.findAll(page, limit);
     }
 
@@ -62,9 +57,6 @@ export class ProductController {
         return this.productService.findOne(+id);
     }
 
-
-
-
     @Patch(':id')
     @Roles(Role.ADMIN)
     update(
@@ -73,9 +65,6 @@ export class ProductController {
     ) {
         return this.productService.update(id, updateProductDto);
     }
-
-
-
 
     @Delete(':id')
     @Roles(Role.ADMIN)

@@ -8,13 +8,11 @@ import { TagsSchema } from '../tags/schemas/tags.schema';
 @Module({
     imports: [
         MongooseModule.forFeature([
-            { 
-                name: 'Product', 
-                schema: ProductSchema 
-            }
+            {
+                name: 'Product',
+                schema: ProductSchema,
+            },
         ]),
-
-
     ],
     controllers: [ProductController],
     providers: [ProductService],

@@ -5,19 +5,20 @@ export type ProductDocument = HydratedDocument<Product>;
 
 @Schema({ timestamps: true, collection: 'Products' })
 export class Product {
-    
-    @Prop({ 
-        required: true, 
-        unique: true 
+    @Prop({
+        required: true,
+        unique: true,
     })
     name: string;
-    
-    @Prop({ 
-        type: [{ 
-            type: Types.ObjectId, 
-            ref: 'Tags'
-        }], 
-        default: [] 
+
+    @Prop({
+        type: [
+            {
+                type: Types.ObjectId,
+                ref: 'Tags',
+            },
+        ],
+        default: [],
     })
     Tags: Types.ObjectId[];
 
@@ -26,7 +27,7 @@ export class Product {
 
     @Prop()
     description: string;
-    
+
     @Prop()
     thumbnailUrl: string;
 

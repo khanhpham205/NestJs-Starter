@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+    ConflictException,
+    Injectable,
+    InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Model, Types } from 'mongoose';
@@ -7,15 +11,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { existsSync, mkdirSync, writeFileSync, unlinkSync } from 'fs';
 import { join, extname } from 'path';
 
-
-
 @Injectable()
 export class ProductService {
     constructor(
-        @InjectModel(Product.name) 
-        private readonly productModel: Model<Product>
+        @InjectModel(Product.name)
+        private readonly productModel: Model<Product>,
     ) {}
-    
+
     async create(
         createProductDto: CreateProductDto,
         file: Express.Multer.File,
@@ -24,26 +26,25 @@ export class ProductService {
             const _id = new Types.ObjectId(); // product id
             // use memoryStorage to handle file upload
             // easy to want custom file path
-            
-            if(file) {
-                // save file 
+
+            if (file) {
+                // save file
                 const folder = join(
-                    process.cwd(), 
-                    `public/product`, 
-                    _id.toString()
+                    process.cwd(),
+                    `public/product`,
+                    _id.toString(),
                 );
 
                 if (!existsSync(folder)) mkdirSync(folder, { recursive: true });
-                
+
                 const filename = `thumbnail-${Date.now()}${extname(file.originalname)}`;
                 const filePath = join(folder, filename);
-                
-                
+
                 createProductDto.image = `public/product/${_id.toString()}/${filename}`;
-                
+
                 const newProduct = await this.productModel.create({
                     _id,
-                    ...createProductDto
+                    ...createProductDto,
                 });
 
                 writeFileSync(filePath, file.buffer);
@@ -54,14 +55,14 @@ export class ProductService {
             if (error.code === 11000) {
                 throw new ConflictException('Product already exists');
             }
-            throw new InternalServerErrorException('Could not create product');   
+            throw new InternalServerErrorException('Could not create product');
         }
     }
-    
+
     async findAllByIncludeTags(
         page: number,
         limit: number,
-        tags: Types.ObjectId []
+        tags: Types.ObjectId[],
     ) {
         page = Number.isInteger(page) && page > 0 ? page : 1;
         limit = Number.isInteger(limit) && limit > 0 ? limit : 1;
@@ -69,7 +70,7 @@ export class ProductService {
             const products = this.productModel
                 .find({
                     tags: { $in: tags },
-                    isDeleted: false
+                    isDeleted: false,
                 })
                 .populate('Tags')
                 .exec();
@@ -82,7 +83,7 @@ export class ProductService {
     async findAllByHaveAllTags(
         page: number,
         limit: number,
-        tags: Types.ObjectId []
+        tags: Types.ObjectId[],
     ) {
         // by tags, limit, page
         page = Number.isInteger(page) && page > 0 ? page : 1;
@@ -90,8 +91,8 @@ export class ProductService {
         try {
             const products = this.productModel
                 .find({
-                    tags: { $all: tags }, 
-                    isDeleted: false
+                    tags: { $all: tags },
+                    isDeleted: false,
                 })
                 .populate('Tags')
                 .exec();
@@ -101,10 +102,7 @@ export class ProductService {
         }
     }
 
-    async findAll(
-        page: number, 
-        limit: number, 
-    ) {
+    async findAll(page: number, limit: number) {
         // by tags, limit, page
         page = Number.isInteger(page) && page > 0 ? page : 1;
         limit = Number.isInteger(limit) && limit > 0 ? limit : 1;
@@ -128,7 +126,7 @@ export class ProductService {
                 .findById(id)
                 .populate('Tags')
                 .exec();
-            return product; 
+            return product;
         } catch (error) {
             return 'Could not get Product';
         }
@@ -137,8 +135,8 @@ export class ProductService {
     async update(id: string, updateProductDto: UpdateProductDto) {
         try {
             await this.productModel
-            .findByIdAndUpdate(id, updateProductDto)
-            .exec();
+                .findByIdAndUpdate(id, updateProductDto)
+                .exec();
             return 'Product updated successfully';
         } catch (error) {
             return 'Could not update Product';

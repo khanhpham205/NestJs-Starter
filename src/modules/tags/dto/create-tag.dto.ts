@@ -1,7 +1,6 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateTagDto {
-
     @IsNotEmpty()
     @IsString()
     tagName: string;
@@ -13,6 +12,4 @@ export class CreateTagDto {
     @IsString()
     @IsOptional()
     image: string;
-    
-    
 }

@@ -8,14 +8,11 @@ export class Tags {
     @Prop({ required: true, unique: true })
     tagName: string;
 
-
     @Prop()
     discription: string;
-    
+
     @Prop()
     image: string;
-
-
 
     @Prop()
     deletedAt: Date; // soft detele

@@ -15,10 +15,8 @@ import { AuthService } from './auth.service';
 
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { JwtAuthGuard } from './passport/jwt-auth.guard';
 import { GoogleAuthGuard, LocalAuthGuard } from './passport/all-auth.guard';
-import { register } from 'node:module';
+import { Public } from '@/decorator/custom';
 
 @Controller('auth')
 export class AuthController {
@@ -27,7 +25,7 @@ export class AuthController {
     @Get('me')
     me(@Req() req: Request) {
         return req.user;
-    
+    }
 
     @Post('register')
     @Public()
@@ -59,7 +57,7 @@ export class AuthController {
     @Get('google')
     @Public()
     @UseGuards(GoogleAuthGuard)
-    async googleAuth(@Req() req) {
+    googleAuth() {
         // start GG Oauth2 flow
         // GG will redirect to GG login page
     }
@@ -68,8 +66,8 @@ export class AuthController {
     @Public()
     @UseGuards(GoogleAuthGuard)
     async googleAuthRedirect(
-        @Req() req: Request, 
-        @Res({ passthrough: true }) res: Response
+        @Req() req: Request,
+        @Res({ passthrough: true }) res: Response,
     ) {
         const a = await this.authService.loginWithGoogle(req.user);
         res.cookie('refresh_token', a.refresh_token, {
@@ -79,14 +77,11 @@ export class AuthController {
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
-        return {access_token : a.access_token};
+        return { access_token: a.access_token };
     }
 
     @Post('logout')
-    logout(
-        @Req() req: Request ,
-        @Res({ passthrough: true }) res: Response
-    ) {
+    logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
         const refresh_token = req.cookies?.refresh_token;
         this.authService.clearRefreshToken(refresh_token);
         res.clearCookie('refresh_token');
@@ -96,25 +91,24 @@ export class AuthController {
     @Post('refresh')
     @Public()
     async refresh(
-        @Req() req: Request, 
-        @Res({ passthrough: true }) res: Response
+        @Req() req: Request,
+        @Res({ passthrough: true }) res: Response,
     ) {
-
         try {
-            const refresh_token = req.cookies?.refresh_token;
-            
+            const cookies = req.cookies as Record<string, string | undefined>;
+            const refresh_token = cookies?.refresh_token;
+
             if (!refresh_token) {
                 throw new BadRequestException('No refresh token provided');
             }
 
             const result = await this.authService.refreshToken(refresh_token);
-            
-            return this.authService.refreshToken(refresh_token);
+
             return {
                 message: 'Token refreshed successfully',
                 access_token: result.access_token,
             };
-        } catch (error) {
+        } catch {
             // Clear invalid cookie
             res.clearCookie('refresh_token');
             throw new UnauthorizedException('Invalid refresh token');

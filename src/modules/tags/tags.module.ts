@@ -6,10 +6,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{
-            name: 'Tags',
-            schema: TagsSchema,
-        }])
+        MongooseModule.forFeature([
+            {
+                name: 'Tags',
+                schema: TagsSchema,
+            },
+        ]),
     ],
     controllers: [TagsController],
     providers: [TagsService],

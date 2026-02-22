@@ -1,25 +1,21 @@
-import { Optional } from "@nestjs/common";
-import { IsDate, IsNotEmpty, IsString, MinLength } from "class-validator";
-
-
-
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateUserGoogleDto {
     @IsNotEmpty()
     @IsString()
     userName: string;
-    
+
     @IsNotEmpty()
     @IsString()
     email: string;
 
-    @Optional()
+    @IsOptional()
     @IsString()
-    googleId:string
+    googleId: string;
 
-    @Optional()
+    @IsOptional()
     @IsNotEmpty()
-    verified:boolean;
+    verified: boolean;
     // @Optional()
     // @IsString()
     // googleAccessToken:string
@@ -31,6 +27,4 @@ export class CreateUserGoogleDto {
     // @Optional()
     // @IsDate()
     // googleTokenExpiry:Date;
-
 }
-
